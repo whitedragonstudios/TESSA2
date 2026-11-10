@@ -1,14 +1,28 @@
-"""BME680 sensor. Run: python3 test_bme680.py"""
+"""BME688 sensor (uses the adafruit_bme680 driver). Run: python3 test_bme680.py"""
 import time
 import adafruit_bme680
 from adafruit_extended_bus import ExtendedI2C
 
 BUS = 4
-ADDR = 0x76   # use 0x77 if SDO is tied high
+ADDRS = (0x76, 0x77)   # 0x77 is the usual default; 0x76 when SDO is tied low
 
-sensor = adafruit_bme680.Adafruit_BME680_I2C(ExtendedI2C(BUS), address=ADDR)
+i2c = ExtendedI2C(BUS)
+sensor = None
+for addr in ADDRS:
+    try:
+        sensor = adafruit_bme680.Adafruit_BME680_I2C(i2c, address=addr)
+        print(f"BME688 found at 0x{addr:02x}")
+        break
+    except (ValueError, OSError):
+        print(f"nothing at 0x{addr:02x}")
+    except RuntimeError as e:
+        raise SystemExit(f"Chip answered at 0x{addr:02x} but the driver rejected it: {e}")
+
+if sensor is None:
+    raise SystemExit(f"No sensor at {[hex(a) for a in ADDRS]} on bus {BUS}. "
+                     f"Try: i2cdetect -y {BUS}")
+
 time.sleep(1)
-
 for _ in range(3):
     print(f"temp {sensor.temperature:.1f} C  humidity {sensor.relative_humidity:.1f} %  "
           f"pressure {sensor.pressure:.1f} hPa  gas {sensor.gas} ohm")
