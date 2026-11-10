@@ -1,0 +1,7 @@
+adafruit-blinka
+adafruit-extended-bus
+adafruit-circuitpython-mcp230xx
+adafruit-circuitpython-bme680
+adafruit-circuitpython-ssd1306
+gpiozero
+pillow
