@@ -7,7 +7,7 @@ For one LED per ROW (all on COM0) use: LED_MAP = [(0, r) for r in range(10)]
 import time
 from adafruit_extended_bus import ExtendedI2C
 
-BARS = {5: 0x70, 6: 0x70}   # I2C bus -> address
+BARS = {6: 0x70, 3: 0x70}   # I2C bus -> address
 LED_MAP = [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4),
            (1, 0), (1, 1), (1, 2), (1, 3), (1, 4)]
 

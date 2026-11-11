@@ -2,7 +2,7 @@
 import time
 from gpiozero import Button
 
-PINS = [17, 27]   # BCM numbers
+PINS = [24, 25]   # BCM numbers
 
 for n, pin in enumerate(PINS, 1):
     sw = Button(pin, pull_up=True)

@@ -4,7 +4,7 @@ import adafruit_ssd1306
 from adafruit_extended_bus import ExtendedI2C
 from PIL import Image, ImageDraw
 
-BUS = 3
+BUS = 5
 ADDR = 0x3C
 WIDTH, HEIGHT = 128, 64
 

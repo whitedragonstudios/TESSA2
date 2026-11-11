@@ -2,7 +2,7 @@
 import time
 from gpiozero import RGBLED
 
-RED, GREEN, BLUE = 19, 13, 26   # BCM numbers
+RED, GREEN, BLUE = 19, 16, 26   # BCM numbers
 
 led = RGBLED(red=RED, green=GREEN, blue=BLUE)
 
