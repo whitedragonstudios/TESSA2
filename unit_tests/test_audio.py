@@ -4,7 +4,7 @@ import struct
 import subprocess
 import wave
 
-DEVICE = None   # e.g. "plughw:Headphones"; None = system default
+DEVICE = "plughw:Headphones"   # the 3.5mm jack; None = system default (often HDMI)
 RATE = 22050
 
 
