@@ -1,11 +1,9 @@
 """MCP23017: 12-position switch + 4 buttons. Run: python3 test_mcp23017.py
 
 Pin numbers: A0-A7 are 0-7, B0-B7 are 8-15.
-
-This maps your wiring instead of assuming it. Part 1: turn the switch to each
-position when asked and it prints which MCP pin went low. Part 2: press each
-button when asked and it prints which pin went low. Keep buttons released
-during Part 1 and the switch left alone during Part 2.
+SWITCH_PINS is the MCP pin for switch position 1, 2, 3 ... 12 in order.
+BUTTON_PINS is assumed to be A0-A3 (the four pins the switch does not use).
+Edit either list if your wiring differs.
 """
 import time
 from adafruit_extended_bus import ExtendedI2C
@@ -13,7 +11,8 @@ from adafruit_mcp230xx.mcp23017 import MCP23017
 
 BUS = 1
 ADDR = 0x27
-ALL_PINS = list(range(16))
+SWITCH_PINS = [6, 7, 15, 14, 13, 12, 11, 10, 9, 8, 5, 4]
+BUTTON_PINS = [0, 1, 2, 3]
 
 i2c = ExtendedI2C(BUS)
 mcp = MCP23017(i2c, address=ADDR)   # fails here if the chip does not answer
@@ -26,36 +25,37 @@ def name(pin):
     return f"{'A' if pin < 8 else 'B'}{pin % 8}"
 
 
-def low_pins(exclude=()):
+def low_pins(candidates):
     state = ~mcp.gpio & 0xFFFF      # bit set = pin pulled low
-    return [p for p in ALL_PINS if state >> p & 1 and p not in exclude]
+    return [p for p in candidates if state >> p & 1]
 
 
-def report(label, pins):
-    if len(pins) == 1:
-        print(f"  {label} -> {name(pins[0])}")
-        return pins[0]
-    print(f"  {label} -> FAIL, pins low: {[name(p) for p in pins] or 'none'}")
-    return None
+def wait(cond, secs=15):
+    end = time.time() + secs
+    while time.time() < end:
+        if cond():
+            return True
+        time.sleep(0.02)
+    return False
 
 
-print("\n--- 12-position switch (buttons released) ---")
-switch = []
-for pos in range(1, 13):
-    input(f"Turn the switch to position {pos}, then press Enter... ")
-    time.sleep(0.2)
-    switch.append(report(f"position {pos}", low_pins()))
+print("\n--- 12-position switch ---")
+for pos, pin in enumerate(SWITCH_PINS, 1):
+    print(f"Turn the switch to position {pos} (expect {name(pin)})")
+    ok = wait(lambda: low_pins(SWITCH_PINS) == [pin])
+    if ok:
+        print("  PASS")
+    else:
+        seen = [name(p) for p in low_pins(SWITCH_PINS)] or "none"
+        print(f"  FAIL (saw {seen})")
 
-print("\n--- Buttons (switch left in place; its pin is ignored) ---")
-ignore = {p for p in switch if p is not None}
-buttons = []
-for n in range(1, 5):
-    input(f"Press and HOLD button {n}, then press Enter... ")
-    time.sleep(0.2)
-    buttons.append(report(f"button {n}", low_pins(exclude=ignore)))
-
-print(f"\nSWITCH_PINS = {switch}")
-print(f"BUTTON_PINS = {buttons}")
-used = [p for p in switch + buttons if p is not None]
-print("Duplicates:", sorted({p for p in used if used.count(p) > 1}) or "none")
-print("Unused pins:", [name(p) for p in ALL_PINS if p not in used] or "none")
+print("\n--- Buttons ---")
+for n, pin in enumerate(BUTTON_PINS, 1):
+    print(f"Press and hold button {n} (expect {name(pin)})")
+    ok = wait(lambda: pin in low_pins(BUTTON_PINS))
+    if ok:
+        print("  PASS")
+    else:
+        seen = [name(p) for p in range(16) if p not in SWITCH_PINS and p in low_pins(range(16))] or "none"
+        print(f"  FAIL (other pins low: {seen})")
+    wait(lambda: pin not in low_pins(BUTTON_PINS))
