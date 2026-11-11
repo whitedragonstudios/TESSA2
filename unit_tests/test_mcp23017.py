@@ -2,7 +2,7 @@
 
 Pin numbers: A0-A7 are 0-7, B0-B7 are 8-15.
 SWITCH_PINS is the MCP pin for switch position 1, 2, 3 ... 12 in order.
-BUTTON_PINS is assumed to be A0-A3 (the four pins the switch does not use).
+BUTTON_PINS is assumed to be the four pins the switch does not use: A0-A3.
 Edit either list if your wiring differs.
 """
 import time
@@ -11,7 +11,7 @@ from adafruit_mcp230xx.mcp23017 import MCP23017
 
 BUS = 1
 ADDR = 0x27
-SWITCH_PINS = [6, 7, 15, 14, 13, 12, 11, 10, 9, 8, 5, 4]
+SWITCH_PINS = [9, 8, 7, 6, 5, 4, 15, 14, 13, 12, 11, 10]
 BUTTON_PINS = [0, 1, 2, 3]
 
 i2c = ExtendedI2C(BUS)
