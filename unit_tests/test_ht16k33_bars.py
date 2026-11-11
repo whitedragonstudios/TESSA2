@@ -8,7 +8,7 @@ import time
 from adafruit_extended_bus import ExtendedI2C
 
 BARS = {6: 0x70, 3: 0x70}   # I2C bus -> address
-LED_MAP = [(0, r) for r in range(10)]   # all cathodes on COM0, LED n on ROW(n-1)
+LED_MAP = [(0, r) for r in range(1, 11)]   # all cathodes on COM0, LED n on ROW n (ROW1-ROW10)
 
 
 def send(i2c, addr, data):
